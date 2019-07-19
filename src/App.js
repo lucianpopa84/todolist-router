@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useReducer, useEffect } from "react";
+import Form from "./components/Form";
+import Filter from "./components/Filter";
+import TodoList from "./components/TodoList";
+import AppContext from "./AppContext";
+import todosReducer from "./todosReducer";
+import { ALL } from "./useFilter";
 
-function App() {
+import "./App.css";
+
+function App({ match }) {
+  const [todos, todosDispatch] = useReducer(
+    todosReducer,
+    JSON.parse(localStorage.getItem("todos")) || []
+  );
+
+  const activeFilter = match.params.filter || ALL;
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+  }, [todos]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider value={{ todos, todosDispatch, activeFilter }}>
+      <div className="todo-app">
+        <Form />
+        <Filter />
+        <TodoList />
+      </div>
+    </AppContext.Provider>
   );
 }
 
